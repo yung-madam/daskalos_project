@@ -1,0 +1,1053 @@
+<HTML>
+<STYLE TYPE="TEXT/CSS">
+TABLE.UML {
+	BORDER-WIDTH: 1PX 1PX 1PX 1PX;
+	BORDER-SPACING: 0PX;
+	BORDER-STYLE: SOLID SOLID SOLID SOLID;
+	BORDER-COLOR: BLACK BLACK BLACK BLACK;
+	BORDER-COLLAPSE: SEPARATE;
+	BACKGROUND-COLOR: WHITE;
+}
+
+CODE {
+	FONT-FAMILY: ARIAL;
+	FONT-SIZE: 80%;
+}
+
+PRE {
+	FONT-FAMILY: ARIAL;
+	FONT-SIZE: 80%;
+}
+
+H1 {
+	FONT-FAMILY: ARIAL;
+	FONT-SIZE: 144%;
+	FONT-STYLE: BOLD;
+}
+
+H2 {
+	FONT-FAMILY: ARIAL;
+	FONT-SIZE: 120%;
+	FONT-STYLE: BOLD;
+}
+
+H3 {
+	FONT-FAMILY: ARIAL;
+	FONT-SIZE: 100%;
+	FONT-STYLE: BOLD;
+}
+
+</STYLE>
+<HEAD>
+<TITLE>
+Pujcovna videoher</TITLE>
+</HEAD>
+<BODY>
+<H1>Pujcovna videoher</H1>
+<B>author&#40;s&#41;: </B>Adam Bil
+<BR>
+<P>
+Objektove modelovani&#44; Adam B&#237;l &#40;INFO&#44; 3. studijni skupina&#41;<BR>
+<BR>
+Vzhledem k me celozivotni zalibe v pocitacovych hrach jsem se rozhodl za svuj semestralni projekt na predmet Objektove modelovani vytvorit &#39;databazi&#39; pujcovny videoher. Je zde zaznamenana personalistika pujcoven&#44; jejich zakazniku a sortiment v jednotlivych pujcovnach.<BR>
+<BR>
+Zakladem celeho projektu je sedm trid&#44; ktere jsem pojmenoval Pujcovny&#44; Hry&#44; Bydliste&#44; Lide&#44; Zakaznici&#44; Pracovnik a Pujcky.<BR>
+	Trida Pujcovny obsahuje nazev pujcovny&#44; adresu&#44; kde se pujcovna nachazi&#44; datum zalozeni&#44; tedy kdy vlastne byla pujcovna vystavena&#44; zemi&#44; ve ktere se nachazi a cislo popisne.<BR>
+	Trida Hry&#44; ve ktere je nazev hry&#44; datum vydani hry&#44; od kdy je hra dostupna na vypujceni&#44; zanr hry a ve ktere pujcovne se hra nachazi.<BR>
+	Trida Bydliste&#44; ve ktere je zaznamenana zeme&#44; mesto&#44; ulice a cislo popisne. Cela tato trida slouzi k propojeni s jednotlivymi osobami.<BR>
+	Trida Lide obsahuje jmeno&#44; prijmeni&#44; telefonni cislo&#44; datum narozeni a misto bydliste jednotlivych osob.<BR>
+	Trida Zakaznici odkazuje na jednotlive osoby a to&#44; zda si lide plati premiovy ucet v pujcovne.<BR>
+	Trida Pracovnik obsahuje informace o pracovni pozici osoby&#44; odkaz na jednotlive osoby a pobocku&#44; na ktere osoba pracuje.<BR>
+	Trida Pujcky odkazuje na osobu&#44; ktera si hru vypujcuje&#44; co si vypujcuje a od kdy do kdy si hru vypujci.<BR>
+<BR>
+Dotazy jsou vsechny popsany ve workspacu v zalozce objects.<BR>
+<BR>
+Dulezite je take samozrejme propojeni jednotlivych trid. <BR>
+	Hry jsou propojeny s pujcovnami&#44; aby lide vedeli&#44; kde se hra nachazi. Bydliste je propojeno s lidmi&#44; pro informace o jejich momentalnim misto bydliste. Zakaznici jsou propojeni s lidmi a pujckami&#44; stejne tak je pracovnik spojen s lidmi a pujcovnami. V posledni rade jsou hry spojeny s pujckami.<BR>
+<BR>
+	Nadale jsou take dve &quot;skryte&quot; metody&#44; a to vek u osob a cena pujcky vzhledem k casu&#44; ktery bude hra vypujcena.<BR>
+
+</P>
+
+<BR>
+<HR>
+<H2>Workspace</H2>
+<PRE>Pujcovna project: &#35;nazev with: &#35;adresa.
+&#40;&#40;Clovek select: [:x|x vek&gt;=23]&#41; project: &#35;jmeno with: &#35;prijmeni with: &#35;vek&#41;.
+&#40;&#40;Hra select: [:x|x dostupnostOd &gt;=&#39;5.14.2017&#39; asDate]&#41; project: &#35;nazevHry&#41;.
+&#40;&#40;Hra select: [:x|x zanr = &#39;FPS&#39;]&#41; project: &#35;nazevHry with: &#35;pujcovna&#41;.
+&#40;&#40;Pujcka select: [:x|x cena &gt; 200]&#41; project: &#35;co with: &#35;kdo with: &#35;cena&#41;.
+&#40;&#40;Zakaznik select: [:x|x premiovy = 1]&#41; project: &#35;clovek&#41;.
+
+&quot;Nedostacijici dotazy jsou popsany nahore&#44; dostacujici jsou popsany dole&quot;
+
+&quot;Vypise jmeno cloveka&#44; ktery vypujcil Witchera 3&quot;
+&#40;Hry select: [: x | x nazevHry = &#39;Witcher 3&#39;]&#41; collect: [:x | x vypujcujici clovek]
+
+&quot;Vypise krestni jmeno toho&#44; kdo si co vypujcil hru May 14&#44; 2017&quot;
+&#40;Pujcky select: [:x | x kdy = &#39;5.26.2017&#39; asDate]&#41; collect: [:x | x kdo clovek jmeno] with: [:x | x co nazevHry]
+
+&quot;Vypise jmeno a prijmeni osob starsich 23 let a napise mesto a ulici&#44; ve ktere bydli&quot;
+&#40;Lide select: [:x|x vek&gt;=23]&#41; collect: [:x | x mistoBydliste mesto] with: [:x|x mistoBydliste ulice] with: [:x| x jmeno] with: [:x|x prijmeni]
+
+&quot;Vypise jmeno a prijmeni cloveka pracujiciho na pobocce JRC a jeho pozici&quot;
+&#40;Pracant select: [:x | x pobocka nazev = &#39;JRC&#39;]&#41; collect: [:x| x clovek jmeno] with: [:x|x clovek prijmeni] with: [:x|x zamestnani]
+
+&quot;Pokud je hra skladem&#44; vypise jeji nazev&#44; pujcovnu a jmeno a prijmeni pripadneho vypujcujiciho zamestnance&quot;
+&#40;Hry select: [:x|x moznostVypujceni = true]&#41; collect: [:x|x nazevHry] with: [:x|x pujcovna] with: [:x|x vypujcujici clovek jmeno] with: [:x|x vypujcujici clovek prijmeni]</PRE>
+<H4>Workspace Objects</H4>
+<UL>
+
+<BR>
+<LI>
+<CODE>
+Bydliste :Set
+</CODE>
+<LI>
+<CODE>
+Hry :Set
+</CODE>
+<LI>
+<CODE>
+Lide :Set
+</CODE>
+<LI>
+<CODE>
+Pracant :Set
+</CODE>
+<LI>
+<CODE>
+Pujcky :Set
+</CODE>
+<LI>
+<CODE>
+Pujcovny :Set
+</CODE>
+<LI>
+<CODE>
+Zakaznici :Set
+</CODE>
+</UL>
+
+<BR>
+<HR>
+<H2>Script</H2>
+<PRE>&quot;Note that variables begining with uppercase letter will be moved into the workspace pool.&quot;
+
+Pujcovny := Set new.
+
+p1 := Pujcovna new.
+p1 nazev: &#39;JRC&#39;.
+p1 adresa: &#39;Praha-Andel&#39;.
+p1 datumZalozeni: &#39;1.1.2013&#39; asDate.
+p1 zeme: &#39;Ceska republika&#39;.
+p1 cisloPopisne: &#39;25210&#39; asNumber.
+
+
+p2 := Pujcovna new.
+p2 nazev: &#39;X-Zone&#39;.
+p2 adresa: &#39;Korunni 1279/64&#39;.
+p2 datumZalozeni: &#39;5.14.2012&#39; asDate.
+p2 zeme: &#39;Ceska republika&#39;.
+p2 cisloPopisne: &#39;15200&#39; asNumber.
+
+
+p3 := Pujcovna new.
+p3 nazev: &#39;GAMEplus.cz&#39;.
+p3 adresa: &#39;28. pluku 631/42&#39;.
+p3 datumZalozeni: &#39;7.18.2015&#39; asDate.
+p3 zeme: &#39;Ceska republika&#39;.
+p3 cisloPopisne: &#39;62100&#39; asNumber.
+Pujcovny add: p1; add: p2; add: p3.
+
+
+Hry := Set new.
+
+h1 := Hra new.
+h1 nazevHry: &#39;Team Fortress 2&#39;.
+h1 datumVydani: &#39;10.9.2007&#39; asDate.
+h1 dostupnostOd: &#39;5.14.2017&#39; asDate.
+h1 zanr: &#39;FPS&#39;.
+h1 pocetKusu: 2.
+h1 pujcovna: p1.
+
+h2 := Hra new.
+h2 nazevHry: &#39;Witcher 3&#39;.
+h2 datumVydani: &#39;5.19.2015&#39; asDate.
+h2 dostupnostOd: &#39;5.2.2017&#39; asDate.
+h2 zanr: &#39;RPG&#39;.
+h2 pocetKusu: 3.
+h2 pujcovna: p2.
+
+h3 := Hra new.
+h3 nazevHry: &#39;Beat Hazard&#39;.
+h3 datumVydani: &#39;5.28.2009&#39; asDate.
+h3 dostupnostOd: &#39;5.26.2017&#39; asDate.
+h3 zanr: &#39;Indie&#39;.
+h3 pocetKusu: 0.
+h3 pujcovna: p3.
+Hry add: h3; add: h2; add: h1.
+
+
+
+Bydliste := Set new.
+
+b1 := Bydleni new.
+b1 zeme: &#39;Ceska republika&#39;.
+b1 mesto: &#39;Praha&#39;.
+b1 ulice: &#39;Slezska 14&#39;.
+b1 cisloPopisne: &#39;15000&#39; asNumber.
+
+b2 := Bydleni new.
+b2 zeme: &#39;Ceska republika&#39;.
+b2 mesto: &#39;Cernosice&#39;.
+b2 ulice: &#39;Arbesova 20&#39;.
+b2 cisloPopisne: &#39;25224&#39; asNumber.
+
+b3 := Bydleni new.
+b3 zeme: &#39;Ceska republika&#39;.
+b3 mesto: &#39;Liberec&#39;.
+b3 ulice: &#39;Revnicka 15&#39;.
+b3 cisloPopisne: &#39;66633&#39; asNumber.
+
+b4 := Bydleni new.
+b4 zeme: &#39;Ceska republika&#39;.
+b4 mesto: &#39;Praha&#39;.
+b4 ulice: &#39;Lipanska 4&#39;.
+b4 cisloPopisne: &#39;13000&#39; asNumber.
+
+b5 := Bydleni new.
+b5 zeme: &#39;Ceska republika&#39;.
+b5 mesto: &#39;Kladno&#39;.
+b5 ulice: &#39;Plzenska 32&#39;.
+b5 cisloPopisne: &#39;26541&#39; asNumber.
+
+b6 := Bydleni new.
+b6 zeme: &#39;Ceska republika&#39;.
+b6 mesto: &#39;Plzen&#39;.
+b6 ulice: &#39;Kladenska 19&#39;.
+b6 cisloPopisne: &#39;14563&#39; asNumber.
+Bydliste add: b1; add: b2; add: b3; add: b4; add: b5; add: b6.
+
+
+Lide := Set new.
+
+l1 := Clovek new.
+l1 jmeno: &#39;Adam&#39;.
+l1 prijmeni: &#39;Bil&#39;.
+l1 telCislo: &#39;7775421358&#39; asNumber.
+l1 datumNarozeni: &#39;2.7.1996&#39; asDate.
+l1 mistoBydliste: b1.
+
+l2 := Clovek new.
+l2 jmeno: &#39;Karolina&#39;.
+l2 prijmeni: &#39;Skalova&#39;.
+l2 telCislo: &#39;731564892&#39; asNumber.
+l2 datumNarozeni: &#39;8.3.1993&#39; asDate.
+l2 mistoBydliste: b2.
+
+l3 := Clovek new.
+l3 jmeno: &#39;Jan&#39;.
+l3 prijmeni: &#39;Hauer&#39;.
+l3 telCislo: &#39;743654841&#39; asNumber.
+l3 datumNarozeni: &#39;8.4.1990&#39; asDate.
+l3 mistoBydliste: b3.
+
+l4 := Clovek new.
+l4 jmeno: &#39;Tomas&#39;.
+l4 prijmeni: &#39;Novotny&#39;.
+l4 telCislo: &#39;741236598&#39; asNumber.
+l4 datumNarozeni: &#39;1.3.1991&#39; asDate.
+l4 mistoBydliste: b4.
+
+l5 := Clovek new.
+l5 jmeno: &#39;Vojtech&#39;.
+l5 prijmeni: &#39;Kraus&#39;.
+l5 telCislo: &#39;777841236&#39; asNumber.
+l5 datumNarozeni: &#39;11.9.1996&#39; asDate.
+l5 mistoBydliste: b5.
+
+l6 := Clovek new.
+l6 jmeno: &#39;Jiri&#39;.
+l6 prijmeni: &#39;Nebesky&#39;.
+l6 telCislo: &#39;604521459&#39; asNumber.
+l6 datumNarozeni: &#39;9.11.1984&#39; asDate.
+l6 mistoBydliste: b6.
+Lide add: l1; add: l2; add: l3; add: l4; add: l5; add: l6.
+
+
+Zakaznici := Set new.
+
+z1 := Zakaznik new.
+z1 premiovy: 1.
+z1 clovek: l1.
+
+z2 := Zakaznik new.
+z2 premiovy: 0.
+z2 clovek: l2.
+
+z3 := Zakaznik new.
+z3 premiovy: 0.
+z3 clovek: l3.
+Zakaznici add: z1; add: z2; add: z3.
+
+
+Pracant := Set new.
+
+prc1 := Pracovnik new.
+prc1 zamestnani: &#39;prodavac&#39;.
+prc1 clovek: l4.
+prc1 pobocka: p1.
+
+prc2 := Pracovnik new.
+prc2 zamestnani: &#39;prodavac&#39;.
+prc2 clovek: l5.
+prc2 pobocka: p2.
+
+prc3 := Pracovnik new.
+prc3 zamestnani: &#39;prodavac&#39;.
+prc3 clovek: l6.
+prc3 pobocka: p3.
+Pracant add: prc1; add: prc2; add: prc3.
+
+
+Pujcky := Set new.
+
+pu1 := Pujcka new.
+pu1 kdo: z1.
+pu1 co: h1.
+pu1 kdy: &#39;5.14.2017&#39; asDate.
+pu1 doKdy: &#39;5.19.2017&#39; asDate.
+
+pu2 := Pujcka new.
+pu2 kdo: z2.
+pu2 co: h2.
+pu2 kdy: &#39;5.2.2017&#39; asDate.
+pu2 doKdy: &#39;5.14.2017&#39; asDate.
+
+pu3 := Pujcka new.
+pu3 kdo: z3.
+pu3 co: h3.
+pu3 kdy: &#39;5.26.2017&#39; asDate.
+pu3 doKdy: &#39;5.28.2017&#39; asDate.
+Pujcky add: pu1; add: pu2; add: pu3.
+
+h1 vypujcujici: prc1.
+h2 vypujcujici: prc2.
+h3 vypujcujici: prc3.</PRE>
+<HR>
+<H2>Diagram</H2>
+<IMG SRC="aDaskalosProject.gif">
+<HR>
+<H2>Classes</H2>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Pujcovna
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+adresa :String
+</CODE>
+<BR>
+<CODE>
+cisloPopisne :Number
+</CODE>
+<BR>
+<CODE>
+datumZalozeni :Date
+</CODE>
+<BR>
+<CODE>
+nazev :String
+</CODE>
+<BR>
+<CODE>
+zeme :String
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+adresa
+</CODE>
+<BR>
+<CODE>
+adresa:
+</CODE>
+<BR>
+<CODE>
+cisloPopisne
+</CODE>
+<BR>
+<CODE>
+cisloPopisne:
+</CODE>
+<BR>
+<CODE>
+datumZalozeni
+</CODE>
+<BR>
+<CODE>
+datumZalozeni:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+nazev
+</CODE>
+<BR>
+<CODE>
+nazev:
+</CODE>
+<BR>
+<CODE>
+zeme
+</CODE>
+<BR>
+<CODE>
+zeme:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     nazev := nil.
+     adresa := nil.
+     datumZalozeni := nil.
+     zeme := nil.
+     cisloPopisne := nil.</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Bydleni
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+cisloPopisne :Number
+</CODE>
+<BR>
+<CODE>
+mesto :String
+</CODE>
+<BR>
+<CODE>
+ulice :String
+</CODE>
+<BR>
+<CODE>
+zeme :String
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+cisloPopisne
+</CODE>
+<BR>
+<CODE>
+cisloPopisne:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+mesto
+</CODE>
+<BR>
+<CODE>
+mesto:
+</CODE>
+<BR>
+<CODE>
+ulice
+</CODE>
+<BR>
+<CODE>
+ulice:
+</CODE>
+<BR>
+<CODE>
+zeme
+</CODE>
+<BR>
+<CODE>
+zeme:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     zeme := nil.
+     mesto := nil.
+     ulice := nil.
+     cisloPopisne := nil.</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Clovek
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+datumNarozeni :Date
+</CODE>
+<BR>
+<CODE>
+jmeno :String
+</CODE>
+<BR>
+<CODE>
+mistoBydliste :Object
+</CODE>
+<BR>
+<CODE>
+prijmeni :String
+</CODE>
+<BR>
+<CODE>
+telCislo :Number
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+datumNarozeni
+</CODE>
+<BR>
+<CODE>
+datumNarozeni:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+jmeno
+</CODE>
+<BR>
+<CODE>
+jmeno:
+</CODE>
+<BR>
+<CODE>
+mistoBydliste
+</CODE>
+<BR>
+<CODE>
+mistoBydliste:
+</CODE>
+<BR>
+<CODE>
+prijmeni
+</CODE>
+<BR>
+<CODE>
+prijmeni:
+</CODE>
+<BR>
+<CODE>
+telCislo
+</CODE>
+<BR>
+<CODE>
+telCislo:
+</CODE>
+<BR>
+<CODE>
+vek
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     jmeno := nil.
+     prijmeni := nil.
+     telCislo := nil.
+     datumNarozeni := nil.
+     mistoBydliste := nil.</PRE>
+<LI>
+<B><CODE>
+vek
+</CODE></B>
+<PRE>
+	datumNarozeni isNil ifTrue: [^0].
+	^&#40;&#40;Date today subtractDate: datumNarozeni&#41; / 365.2422&#41; truncated</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Zakaznik
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+clovek :Object
+</CODE>
+<BR>
+<CODE>
+premiovy :Number
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+clovek
+</CODE>
+<BR>
+<CODE>
+clovek:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+premiovy
+</CODE>
+<BR>
+<CODE>
+premiovy:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     premiovy := nil.
+     clovek := nil.</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Pujcka
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+co :Object
+</CODE>
+<BR>
+<CODE>
+doKdy :Date
+</CODE>
+<BR>
+<CODE>
+kdo :Object
+</CODE>
+<BR>
+<CODE>
+kdy :Date
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+cena
+</CODE>
+<BR>
+<CODE>
+co
+</CODE>
+<BR>
+<CODE>
+co:
+</CODE>
+<BR>
+<CODE>
+doKdy
+</CODE>
+<BR>
+<CODE>
+doKdy:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+kdo
+</CODE>
+<BR>
+<CODE>
+kdo:
+</CODE>
+<BR>
+<CODE>
+kdy
+</CODE>
+<BR>
+<CODE>
+kdy:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+cena
+</CODE></B>
+<PRE>
+	^&#40;&#40;doKdy subtractDate: kdy&#41; &#42; 99&#41; truncated</PRE>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     kdo := nil.
+     co := nil.
+     kdy := nil.
+     doKdy := nil.</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Pracovnik
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+clovek :Object
+</CODE>
+<BR>
+<CODE>
+pobocka :Object
+</CODE>
+<BR>
+<CODE>
+zamestnani :String
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+clovek
+</CODE>
+<BR>
+<CODE>
+clovek:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+pobocka
+</CODE>
+<BR>
+<CODE>
+pobocka:
+</CODE>
+<BR>
+<CODE>
+zamestnani
+</CODE>
+<BR>
+<CODE>
+zamestnani:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     zamestnani := nil.
+     clovek := nil.
+     pobocka := nil.</PRE>
+</UL>
+<TABLE BORDER="0" CELLPADDING="3" CELLSPACING="0" WIDTH=100%>
+<TR>
+<TD WIDTH=20%>
+<TABLE WIDTH=95% BORDER="1" CELLSPACING="0" BORDERCOLOR=BLACK>
+<TR><TD><BIG>
+<B><CODE>
+Hra
+</CODE></B>
+</BIG></TD></TR>
+<TR><TD>
+<I><SMALL>instance variables</SMALL></I><BR>
+<CODE>
+datumVydani :Date
+</CODE>
+<BR>
+<CODE>
+dostupnostOd :Date
+</CODE>
+<BR>
+<CODE>
+nazevHry :String
+</CODE>
+<BR>
+<CODE>
+pocetKusu :Number
+</CODE>
+<BR>
+<CODE>
+pujcovna :Object
+</CODE>
+<BR>
+<CODE>
+vypujcujici :Object
+</CODE>
+<BR>
+<CODE>
+zanr :String
+</CODE>
+<BR>
+</TD></TR>
+<TR><TD>
+<I><SMALL>methods</SMALL></I><BR>
+<CODE>
+datumVydani
+</CODE>
+<BR>
+<CODE>
+datumVydani:
+</CODE>
+<BR>
+<CODE>
+dostupnostOd
+</CODE>
+<BR>
+<CODE>
+dostupnostOd:
+</CODE>
+<BR>
+<CODE>
+initialize
+</CODE>
+<BR>
+<CODE>
+moznostVypujceni
+</CODE>
+<BR>
+<CODE>
+nazevHry
+</CODE>
+<BR>
+<CODE>
+nazevHry:
+</CODE>
+<BR>
+<CODE>
+pocetKusu
+</CODE>
+<BR>
+<CODE>
+pocetKusu:
+</CODE>
+<BR>
+<CODE>
+pujcovna
+</CODE>
+<BR>
+<CODE>
+pujcovna:
+</CODE>
+<BR>
+<CODE>
+vypujcujici
+</CODE>
+<BR>
+<CODE>
+vypujcujici:
+</CODE>
+<BR>
+<CODE>
+zanr
+</CODE>
+<BR>
+<CODE>
+zanr:
+</CODE>
+<BR>
+</TD></TR>
+</TABLE>
+</TD>
+<TD VALIGN="TOP">
+<P>
+
+</P>
+</TD>
+</TR>
+</TABLE>
+<H4>code of non-accessing methods: </H4>
+<UL>
+<LI>
+<B><CODE>
+initialize
+</CODE></B>
+<PRE>
+&quot;generated by Daskalos&quot;
+
+     super initialize.
+     nazevHry := nil.
+     datumVydani := nil.
+     dostupnostOd := nil.
+     zanr := nil.
+     pujcovna := nil.
+     vypujcujici := nil.
+     pocetKusu := nil.</PRE>
+<LI>
+<B><CODE>
+moznostVypujceni
+</CODE></B>
+<PRE>
+	^self pocetKusu &gt;= 1</PRE>
+</UL>
+<HR>
+<H2>Links</H2>
+<A HREF="aDaskalosProject.xml">Data file</A> and 
+<A HREF="aDaskalosProject.st">class source</A>.
+
+<BR>
+
+<BR>
+<CODE>
+Generated by Daskalos - Object Modeling Tutor &#40;C&#41; 2006 V. Merunka
+</CODE>
+
+<BR>
+<CODE>
+June 21&#44; 2017
+</CODE>
+</BODY></HTML>
